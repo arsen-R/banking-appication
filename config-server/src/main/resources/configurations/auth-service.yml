@@ -1,0 +1,25 @@
+server:
+  port: 8081
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:3678/auth_service
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-Auto: create-drop
+    defer-datasource-initialization: true
+    showSql: true
+    databasePlatform: org.hibernate.dialect.PostgreSQLDialect
+    database: postgresql
+
+application:
+  security:
+    jwt:
+      secret-key: 5b4229ea4e3886d9fddafe27d0e6467f139970b0acb52701cb79d30823215027
+      expiration: 900000
+      cookie-name: jwt-cookie
+      refresh-token:
+        expiration: 1296000000
+        cookie-name: refresh-jwt-cookie

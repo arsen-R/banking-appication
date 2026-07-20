@@ -1,27 +1,5 @@
-server:
-  port: 8081
-
 spring:
+  config:
+    import: optional:configserver:http://localhost:8888
   application:
     name: auth-service
-
-application:
-  security:
-    jwt:
-      secret-key: 5b4229ea4e3886d9fddafe27d0e6467f139970b0acb52701cb79d30823215027
-      expiration: 900000
-      cookie-name: jwt-cookie
-      refresh-token:
-        expiration: 1296000000
-        cookie-name: refresh-jwt-cookie
-
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: DEBUG
-        type:
-          description:
-            sql:
-              BasicBinder: TRACE
-
