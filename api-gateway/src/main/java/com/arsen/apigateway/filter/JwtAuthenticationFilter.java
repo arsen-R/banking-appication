@@ -1,55 +1,61 @@
 package com.arsen.apigateway.filter;
 
 import com.arsen.apigateway.util.JwtUtil;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.function.HandlerFilterFunction;
-import org.springframework.web.servlet.function.HandlerFunction;
-import org.springframework.web.servlet.function.ServerRequest;
-import org.springframework.web.servlet.function.ServerResponse;
 
 import java.util.List;
-import java.util.function.Predicate;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class JwtAuthenticationFilter implements HandlerFilterFunction<ServerResponse, ServerResponse> {
-    private final JwtUtil  jwtUtil;
-    private static final List<String> PUBLIC_ENDPOINTS = List.of("/v1/auth/login", "/v1/auth/register", "/eureka");
+public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
+    private final JwtUtil jwtUtil;
 
-    @Override
-    public ServerResponse filter(ServerRequest request, HandlerFunction<ServerResponse> next) throws Exception {
-        Predicate<ServerRequest> serverRequestPredicate = r -> PUBLIC_ENDPOINTS.stream()
-                .noneMatch(uri -> r.uri().getPath().contains(uri));
+    public static class Config {
+        private List<String> publicEndpoints;
 
-        if (serverRequestPredicate.test(request)) {
-            if (authMissing(request)) {
-                return onError();
-            }
-
-            String token = request.headers().asHttpHeaders().getFirst("Authorization");
-            if (token != null && token.startsWith("Bearer ")) {
-                token = token.substring(7);
-            }
-
-            try {
-                jwtUtil.validateToken(token);
-            } catch (Exception e) {
-                return onError();
-            }
+        public List<String> getPublicEndpoints() {
+            return publicEndpoints;
         }
 
-        return next.handle(request);
+        public Config setPublicEndpoints(List<String> publicEndpoints) {
+            this.publicEndpoints = publicEndpoints;
+            return this;
+        }
     }
 
-    private ServerResponse onError() {
-        return ServerResponse.status(HttpStatus.UNAUTHORIZED).build();
-    }
+    @Override
+    public GatewayFilter apply(Config config) {
+        return (exchange, chain) -> {
+            String authHeader = exchange.getRequest().getURI().getPath();
+            if (config != null && config.getPublicEndpoints().stream().anyMatch(authHeader::startsWith)) {
+                return exchange.getResponse().setComplete();
+            }
 
-    private boolean authMissing(ServerRequest request) {
-        return request.headers().asHttpHeaders().getFirst("Authorization") == null;
+            String jwtToken = authHeader.substring(7);
+            try {
+                jwtUtil.validateToken(jwtToken);
+                log.debug("Token validation succeeded for path: {}", authHeader);
+                return chain.filter(exchange);
+            } catch (FeignException.Unauthorized e) {
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                log.error("(Feign Exception - Unauthorized: {}", authHeader, e);
+                return exchange.getResponse().setComplete();
+            } catch (FeignException.Forbidden e) {
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                log.error("(Feign Exception - Forbidden: {}", authHeader, e);
+                return exchange.getResponse().setComplete();
+            } catch (Exception e) {
+                exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+                log.error("(Feign Exception: {}", authHeader, e);
+                return exchange.getResponse().setComplete();
+            }
+        };
     }
 }

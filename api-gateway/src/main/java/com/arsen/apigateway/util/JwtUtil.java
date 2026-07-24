@@ -1,5 +1,6 @@
 package com.arsen.apigateway.util;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
+import java.util.Date;
 
 import static java.security.KeyRep.Type.SECRET;
 
@@ -17,13 +19,16 @@ public class JwtUtil {
     @Value("${application.security.jwt.secret-key}")
     private String SECRET_KEY;
 
-    public void validateToken(final String token) {
-        Jwts.parser()
+    public String validateToken(final String token) {
+        Claims claims = Jwts.parser()
                 .verifyWith(getSignKey())
                 .build()
                 .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+                .getPayload();
+        if (claims.getExpiration().before(new Date())) {
+            throw new IllegalStateException("Token expired");
+        }
+        return claims.getSubject();
     }
 
     private SecretKey getSignKey() {
