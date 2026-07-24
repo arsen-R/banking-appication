@@ -1,4 +1,4 @@
-package com.arsen.auth.jwt;
+package com.arsen.auth.service;
 
 import io.jsonwebtoken.Claims;
 import org.springframework.security.core.userdetails.UserDetails;
