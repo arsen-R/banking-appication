@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
@@ -55,11 +56,10 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSecretKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        return Jwts.parser()
+                .verifyWith(getSecretKey())
+                .build().parseSignedClaims(token)
+                .getPayload();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -67,19 +67,20 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private String createToken(Map<String, Object> claims, UserDetails userDetails) {
-        return Jwts.builder().setClaims(claims)
+        return Jwts.builder()
+                .claims(claims)
                 .claim(ROLES, userDetails.getAuthorities())
                 .claim(USERNAME, userDetails.getUsername())
                 .claim(IS_ENABLED, userDetails.isEnabled())
                 .claim(IS_ACCOUNT_NON_LOCKED, userDetails.isAccountNonLocked())
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + JWT_EXPIRATION))
                 .signWith(getSecretKey())
                 .compact();
     }
 
-    private Key getSecretKey() {
+    private SecretKey getSecretKey() {
         byte[] keyBytes = Base64.getDecoder().decode(JWT_SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
