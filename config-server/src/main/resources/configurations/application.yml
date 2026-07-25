@@ -18,7 +18,7 @@ management:
 application:
   security:
     jwt:
-      secret-key: 5b4229ea4e3886d9fddafe27d0e6467f139970b0acb52701cb79d30823215027
+      secret-key: ${JWT_SECRET_KEY}
       expiration: 900000
       cookie-name: jwt-cookie
       refresh-token:
