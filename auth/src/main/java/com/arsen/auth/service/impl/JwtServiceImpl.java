@@ -46,7 +46,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return userDetails.getUsername().equals(username) && !isTokenExpired(token);
     }
 
     @Override
@@ -81,6 +81,9 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private SecretKey getSecretKey() {
+        if (JWT_SECRET_KEY == null || JWT_SECRET_KEY.isBlank()) {
+            throw new IllegalStateException("application.security.jwt.secret-key is not configured");
+        }
         byte[] keyBytes = Base64.getDecoder().decode(JWT_SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
