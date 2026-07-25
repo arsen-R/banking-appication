@@ -1,6 +1,7 @@
 package com.arsen.auth.config;
 
 import com.arsen.auth.service.JwtService;
+import com.arsen.common.security.jwt.BearerTokens;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,9 +28,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            String authHeader = request.getHeader("Authorization");
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                String token = authHeader.substring(7);
+            String authHeader = request.getHeader(BearerTokens.AUTHORIZATION_HEADER);
+            if (BearerTokens.hasBearerToken(authHeader)) {
+                String token = BearerTokens.extractToken(authHeader);
 
                 String username = jwtService.extractUsername(token);
 
