@@ -3,6 +3,7 @@ package com.arsen.auth.config;
 import com.arsen.auth.handler.AccessDeniedHandlerImpl;
 import com.arsen.auth.handler.AuthenticationEntryPointImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -71,6 +72,13 @@ public class WebSecurityConfig {
                 })
                 .authenticationProvider(daoAuthenticationProvider());
         return http.build();
+    }
+
+    @Bean
+    public FilterRegistrationBean<JwtAuthenticationFilter> jwtAuthenticationFilterRegistration(JwtAuthenticationFilter filter) {
+        FilterRegistrationBean<JwtAuthenticationFilter> registration = new FilterRegistrationBean<>(filter);
+        registration.setEnabled(false);
+        return registration;
     }
 
     private CorsConfigurationSource corsConfigurationSource() {

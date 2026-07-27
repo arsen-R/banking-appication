@@ -8,16 +8,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
-import java.util.Date;
-
-import static java.security.KeyRep.Type.SECRET;
 
 @Component
 public class JwtUtil {
 
     @Value("${application.security.jwt.secret-key}")
-    private String SECRET_KEY;
+    private String secretKey;
 
     public String validateToken(final String token) {
         Claims claims = Jwts.parser()
@@ -25,14 +21,14 @@ public class JwtUtil {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        if (claims.getExpiration().before(new Date())) {
-            throw new IllegalStateException("Token expired");
-        }
         return claims.getSubject();
     }
 
     private SecretKey getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        if (secretKey == null || secretKey.isBlank()) {
+            throw new IllegalStateException("application.security.jwt.secret-key is not configured");
+        }
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
