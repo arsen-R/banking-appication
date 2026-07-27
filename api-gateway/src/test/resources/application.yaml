@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    config:
+      enabled: false
+    discovery:
+      enabled: false
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+application:
+  security:
+    jwt:
+      secret-key: 5b4229ea4e3886d9fddafe27d0e6467f139970b0acb52701cb79d30823215027
