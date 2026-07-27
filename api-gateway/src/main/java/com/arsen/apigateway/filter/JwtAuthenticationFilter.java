@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -33,27 +34,35 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
-            String authHeader = exchange.getRequest().getURI().getPath();
-            if (config != null && config.getPublicEndpoints().stream().anyMatch(authHeader::startsWith)) {
+            String path = exchange.getRequest().getURI().getPath();
+            if (config != null && config.getPublicEndpoints() != null
+                    && config.getPublicEndpoints().stream().anyMatch(path::startsWith)) {
+                return chain.filter(exchange);
+            }
+
+            String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                log.warn("Missing or malformed Authorization header for path: {}", path);
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().setComplete();
             }
 
             String jwtToken = authHeader.substring(7);
             try {
                 jwtUtil.validateToken(jwtToken);
-                log.debug("Token validation succeeded for path: {}", authHeader);
+                log.debug("Token validation succeeded for path: {}", path);
                 return chain.filter(exchange);
             } catch (FeignException.Unauthorized e) {
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                log.error("(Feign Exception - Unauthorized: {}", authHeader, e);
+                log.error("(Feign Exception - Unauthorized: {}", path, e);
                 return exchange.getResponse().setComplete();
             } catch (FeignException.Forbidden e) {
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                log.error("(Feign Exception - Forbidden: {}", authHeader, e);
+                log.error("(Feign Exception - Forbidden: {}", path, e);
                 return exchange.getResponse().setComplete();
             } catch (Exception e) {
-                exchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
-                log.error("(Feign Exception: {}", authHeader, e);
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                log.error("Token validation failed for path: {}", path, e);
                 return exchange.getResponse().setComplete();
             }
         };
