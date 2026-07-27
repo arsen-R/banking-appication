@@ -1,0 +1,26 @@
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
+spring:
+  cloud:
+    config:
+      override-system-properties: false
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+application:
+  security:
+    jwt:
+      secret-key: 5b4229ea4e3886d9fddafe27d0e6467f139970b0acb52701cb79d30823215027
+      expiration: 900000
+      cookie-name: jwt-cookie
+      refresh-token:
+        expiration: 1296000000
+        cookie-name: refresh-jwt-cookie

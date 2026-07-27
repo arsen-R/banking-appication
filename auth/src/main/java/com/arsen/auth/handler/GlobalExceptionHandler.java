@@ -1,0 +1,24 @@
+package com.arsen.auth.handler;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.time.Instant;
+
+@RestControllerAdvice
+@Slf4j
+public class GlobalExceptionHandler {
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ErrorResponse handleIllegalArgument(IllegalArgumentException e) {
+        log.warn("Illegal Argument Exception: ", e);
+        return ErrorResponse.builder()
+                .message(e.getMessage())
+                .path(e.getClass().getSimpleName())
+                .httpStatus(HttpStatus.CONFLICT)
+                .timestamp(Instant.now()).build();
+    }
+
+
+}
