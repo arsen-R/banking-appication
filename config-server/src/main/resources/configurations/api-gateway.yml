@@ -4,13 +4,13 @@ server:
 spring:
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
       server:
-        webmvc:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
           routes:
             - id: auth-service
               uri: lb://auth-service
               predicates:
-                - Path=/api/auth/**¬
+                - Path=/api/auth/**
