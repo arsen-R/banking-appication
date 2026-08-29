@@ -21,14 +21,13 @@ public class User extends BaseEntity {
     @Column(nullable = false, unique = true, updatable = false)
     private String email;
     @Column(nullable = false)
-    @Min(8)
     private String password;
     @Enumerated(EnumType.STRING)
     private UserStatus status;
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_profile_id", referencedColumnName = "id", nullable = false, unique = true)
     private UserProfile userProfile;
-    @ManyToOne
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> role = new HashSet<>();
 }

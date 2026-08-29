@@ -1,24 +1,28 @@
 package com.arsen.userservice.model.entiry;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.Instant;
 
 @Entity
-@Table
-public class UserProfile {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @Column(nullable = false)
+@Table(name = "user_profiles")
+@Data
+@EqualsAndHashCode(callSuper = false)
+@ToString
+@NoArgsConstructor
+@RequiredArgsConstructor
+public class UserProfile extends BaseEntity {
+    @NonNull
     private String firstName;
-    @Column(nullable = false)
+    @NonNull
     private String lastName;
-    @Column(nullable = false)
+    @NonNull
     private Instant birthday;
-    @Column(nullable = false, name = "cell_phone_number")
+    @Column(name = "cell_phone_number")
+    @NonNull
     private String cellPhoneNumber;
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "userProfile")
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 }
