@@ -1,5 +1,6 @@
-package com.arsen.userservice.component;
+package com.arsen.userservice.component.annotation;
 
+import com.arsen.userservice.component.validation.PhoneNumberValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 

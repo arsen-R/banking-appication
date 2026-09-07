@@ -1,7 +1,7 @@
 package com.arsen.userservice.model.request;
 
 import com.arsen.userservice.model.dto.RoleDto;
-import com.arsen.userservice.component.CellPhoneNumber;
+import com.arsen.userservice.component.annotation.CellPhoneNumber;
 import jakarta.validation.constraints.*;
 
 import java.util.Date;
