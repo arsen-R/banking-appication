@@ -1,13 +1,16 @@
 package com.arsen.userservice.repository;
 
 import com.arsen.userservice.model.entiry.UserProfile;
+import com.arsen.userservice.util.DateUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 
+import java.sql.Date;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,14 +21,9 @@ class UserProfileRepositoryTest {
     @Autowired
     private UserProfileRepository userProfileRepository;
 
-    @AfterEach
-    void tearDown() {
-        userProfileRepository.deleteAll();
-    }
-
     @Test
     void testFindUserProfileByFirstNameShouldReturnUserProfileWhenFirstNameFound() {
-        UserProfile userProfile = userProfileRepository.save(new UserProfile("Zara", "Brown", Instant.now().minusSeconds(832479212), "+14847748731"));
+        UserProfile userProfile = userProfileRepository.save(new UserProfile("Zara", "Brown", DateUtil.asDate(LocalDate.of(1991, 7, 12)), "+14847748731"));
 
         Optional<UserProfile> foundUserProfile = userProfileRepository.findByFirstName("Zara");
 
@@ -39,7 +37,7 @@ class UserProfileRepositoryTest {
 
     @Test
     void testFindUserProfileByFirstNameShouldReturnEmptyWhenFirstNameNotFound() {
-        userProfileRepository.save(new UserProfile("Mike", "Cook", Instant.now().minusSeconds(83427897), "+17890096431"));
+        userProfileRepository.save(new UserProfile("Mike", "Cook", DateUtil.asDate(LocalDate.of(2000, 1, 22)), "+17890096431"));
 
         Optional<UserProfile> foundUserProfile = userProfileRepository.findByFirstName("Arsen");
 
@@ -48,7 +46,7 @@ class UserProfileRepositoryTest {
 
     @Test
     void testFindUserProfileByLastNameShouldReturnUserProfileWhenLastNameFound() {
-        UserProfile userProfile = userProfileRepository.save(new UserProfile("Sean", "McDonald", Instant.now().minusSeconds(32763487), "+17607749310"));
+        UserProfile userProfile = userProfileRepository.save(new UserProfile("Sean", "McDonald", DateUtil.asDate(LocalDate.of(1981, 12, 12)), "+17607749310"));
 
         Optional<UserProfile> foundUserProfile = userProfileRepository.findByLastName("McDonald");
 
@@ -62,7 +60,7 @@ class UserProfileRepositoryTest {
 
     @Test
     void testFindUserProfileByLastNameShouldReturnEmptyWhenLastNameNotFound() {
-        userProfileRepository.save(new UserProfile("Katherina", "River", Instant.now().minusSeconds(13847483), "+19932661279"));
+        userProfileRepository.save(new UserProfile("Katherina", "River", DateUtil.asDate(LocalDate.of(1999, 2, 2)), "+19932661279"));
 
         Optional<UserProfile> foundUserProfile = userProfileRepository.findByLastName("Andrew");
 
@@ -71,7 +69,7 @@ class UserProfileRepositoryTest {
 
     @Test
     void testFindUserProfileByFirstNameAndLastNameShouldReturnUserProfileWhenFirstNameAndLastNameFound() {
-        UserProfile userProfile = userProfileRepository.save(new UserProfile("Mario", "Hope", Instant.now().minusSeconds(8231274), "+11932361572"));
+        UserProfile userProfile = userProfileRepository.save(new UserProfile("Mario", "Hope", DateUtil.asDate(LocalDate.of(1989, 8, 1)), "+11932361572"));
 
         Optional<UserProfile> foundUserProfile = userProfileRepository.findByFirstNameAndLastName("Mario", "Hope");
 
@@ -85,7 +83,7 @@ class UserProfileRepositoryTest {
 
     @Test
     void testFindUserProfileByFirstNameAndLastNameShouldReturnEmptyWhenFirstNameAndLastNameNotFound() {
-        userProfileRepository.save(new UserProfile("River", "Hope", Instant.now().minusSeconds(387298), "+11936371872"));
+        userProfileRepository.save(new UserProfile("River", "Hope", DateUtil.asDate(LocalDate.of(1991, 1, 12)), "+11936371872"));
 
         Optional<UserProfile> foundUserProfile = userProfileRepository.findByFirstNameAndLastName("Maria", "McAlister");
 
@@ -94,42 +92,42 @@ class UserProfileRepositoryTest {
 
     @Test
     void testExistsUserProfileByFirstNameShouldReturnTrueWhenFirstNameExists() {
-        userProfileRepository.save(new UserProfile("Andrew", "Lake", Instant.now().minusSeconds(39894), "+13218908189"));
+        userProfileRepository.save(new UserProfile("Andrew", "Lake", DateUtil.asDate(LocalDate.of(1990, 11, 30)), "+13218908189"));
         boolean result = userProfileRepository.existsByFirstName("Andrew");
         assertTrue(result);
     }
 
     @Test
     void testExistsUserProfileByFirstNameShouldReturnFalseWhenFirstNameNotExists() {
-        userProfileRepository.save(new UserProfile("George", "Lincoln", Instant.now().minusSeconds(23598923), "+11938193900"));
+        userProfileRepository.save(new UserProfile("George", "Lincoln", DateUtil.asDate(LocalDate.of(2001, 2, 28)), "+11938193900"));
         boolean result = userProfileRepository.existsByFirstName("Andrew");
         assertFalse(result);
     }
 
     @Test
     void testExistsUserProfileByLastNameShouldReturnTrueWhenLastNameExists() {
-        userProfileRepository.save(new UserProfile("Diana", "Fox", Instant.now().minusSeconds(688990971), "+16771898390"));
+        userProfileRepository.save(new UserProfile("Diana", "Fox", DateUtil.asDate(LocalDate.of(1993, 4, 2)), "+16771898390"));
         boolean result = userProfileRepository.existsByLastName("Fox");
         assertTrue(result);
     }
 
     @Test
     void testExistsUserProfileByLastNameShouldReturnFalseWhenLastNameNotExists() {
-        userProfileRepository.save(new UserProfile("Richard", "Lawrence", Instant.now().minusSeconds(10000), "+15942349023"));
+        userProfileRepository.save(new UserProfile("Richard", "Lawrence", DateUtil.asDate(LocalDate.of(1997, 1, 11)), "+15942349023"));
         boolean result = userProfileRepository.existsByLastName("Jared");
         assertFalse(result);
     }
 
     @Test
     void testExistsUserProfileByFirstNameAndLastNameShouldReturnTrueWhenFirstNameAndLastNameExists() {
-        userProfileRepository.save(new UserProfile("Michael", "Brooks", Instant.now(), "+16771898390"));
+        userProfileRepository.save(new UserProfile("Michael", "Brooks", DateUtil.asDate(LocalDate.of(1995, 10, 11)), "+16771898390"));
         boolean result = userProfileRepository.existsByFirstNameAndLastName("Michael", "Brooks");
         assertTrue(result);
     }
 
     @Test
     void testExistsUserProfileByFirstNameAndLastNameShouldReturnFalseWhenFirstNameAndLastNameNotExists() {
-        userProfileRepository.save(new UserProfile("Emily", "Walsh", Instant.now(), "+13431871893"));
+        userProfileRepository.save(new UserProfile("Emily", "Walsh", DateUtil.asDate(LocalDate.of(1993, 12, 21)), "+13431871893"));
         boolean result = userProfileRepository.existsByFirstNameAndLastName("Eric", "Brooks");
         assertFalse(result);
     }
