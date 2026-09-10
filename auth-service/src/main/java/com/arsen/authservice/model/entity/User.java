@@ -4,12 +4,8 @@ import com.arsen.authservice.model.enums.UserStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -29,10 +25,14 @@ public class User extends BaseEntity {
     private String password;
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
-    private Boolean isAccountNonExpired;
-    private Boolean isAccountNonLocked;
-    private Boolean isCredentialsNonExpired;
-    private Boolean isEnabled;
+    @Column(nullable = false, name = "is_account_non_expired")
+    private Boolean isAccountNonExpired = true;
+    @Column(nullable = false, name = "is_account_non_locked")
+    private Boolean isAccountNonLocked = true;
+    @Column(nullable = false, name = "is_credentials_non_expired")
+    private Boolean isCredentialsNonExpired = true;
+    @Column(nullable = false, name = "is_enable")
+    private Boolean isEnabled = true;
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "user_roles",
