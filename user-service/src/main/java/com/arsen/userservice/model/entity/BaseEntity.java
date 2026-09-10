@@ -1,4 +1,4 @@
-package com.arsen.userservice.model.entiry;
+package com.arsen.userservice.model.entity;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

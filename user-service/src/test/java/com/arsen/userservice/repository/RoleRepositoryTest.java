@@ -1,6 +1,6 @@
 package com.arsen.userservice.repository;
 
-import com.arsen.userservice.model.entiry.Role;
+import com.arsen.userservice.model.entity.Role;
 import com.arsen.userservice.model.enums.RoleName;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
