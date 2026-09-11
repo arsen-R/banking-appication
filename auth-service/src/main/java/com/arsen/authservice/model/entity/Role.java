@@ -9,14 +9,14 @@ import java.util.Set;
 
 @Entity
 @Table(name = "roles")
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = false)
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class Role extends BaseEntity {
     @Enumerated(EnumType.STRING)
-    @Column(name = "role_name", unique = true, nullable = false)
     private RoleName roleName;
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinTable(
